@@ -138,6 +138,10 @@
 #define WIFI_HOSTSPOT 69 // Nice
 #define BT_SCAN_AIRTAG_MON 70
 #define WIFI_SCAN_CHAN_ACT 71
+#define BT_SCAN_FLOCK 72
+#define BT_SCAN_SIMPLE 73
+#define BT_SCAN_SIMPLE_TWO 74
+#define BT_SCAN_FLOCK_WARDRIVE 75
 
 #define WIFI_ATTACK_FUNNY_BEACON 99 
 
@@ -531,9 +535,7 @@ class WiFiScan
     bool beaconHasWPS(const uint8_t* payload, int len);
     uint8_t getSecurityType(const uint8_t* beacon, uint16_t len);
     void addAnalyzerValue(int16_t value, int rssi_avg, int16_t target_array[], int array_size);
-    bool seen_mac(unsigned char* mac);
     bool mac_cmp(struct mac_addr addr1, struct mac_addr addr2);
-    void save_mac(unsigned char* mac);
     void clearMacHistory();
     void executeWarDrive();
     void executeSourApple();
@@ -615,6 +617,8 @@ class WiFiScan
     uint32_t eapol_frames = 0;
     int8_t min_rssi = 0;
     int8_t max_rssi = -128;
+
+    int bt_frames = 0;
 
     bool force_pmkid = false;
     bool force_probe = false;
@@ -714,6 +718,11 @@ class WiFiScan
     void drawChannelLine();
     #ifdef HAS_SCREEN
       int8_t checkAnalyzerButtons(uint32_t currentTime);
+    #endif
+    bool seen_mac(unsigned char* mac);
+    void save_mac(unsigned char* mac);
+    #ifdef HAS_BT
+      void copyNimbleMac(const BLEAddress &addr, unsigned char out[6]);
     #endif
     bool filterActive();
     bool RunGPSInfo(bool tracker = false, bool display = true, bool poi = false);
