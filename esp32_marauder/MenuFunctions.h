@@ -9,6 +9,10 @@
   #include "Keyboard.h"
 #endif
 
+#ifdef HAS_TOUCH
+  #include "TouchKeyboard.h"
+#endif
+
 #ifdef HAS_SCREEN
 
 #define BATTERY_ANALOG_ON 0
@@ -94,41 +98,12 @@ extern Settings settings_obj;
 #define FORCE 39
 #define FUNNY_BEACON 40
 #define FLOCK 41
-
-PROGMEM void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p);
-PROGMEM bool my_touchpad_read(lv_indev_drv_t * indev_driver, lv_indev_data_t * data);
-
-PROGMEM static lv_disp_buf_t disp_buf;
-PROGMEM static lv_color_t buf[LV_HOR_RES_MAX * 10];
-
-PROGMEM static void ta_event_cb(lv_obj_t * ta, lv_event_t event);
-PROGMEM static void join_wifi_keyboard_event_cb(lv_obj_t * keyboard, lv_event_t event);
-PROGMEM static void start_ap_keyboard_event_cb(lv_obj_t * keyboard, lv_event_t event);
-PROGMEM static void add_ssid_keyboard_event_cb(lv_obj_t * keyboard, lv_event_t event);
-PROGMEM static void html_list_cb(lv_obj_t * btn, lv_event_t event);
-PROGMEM static void ap_list_cb(lv_obj_t * btn, lv_event_t event);
-PROGMEM static void ap_info_list_cb(lv_obj_t * btn, lv_event_t event);
-PROGMEM static void at_list_cb(lv_obj_t * btn, lv_event_t event);
-PROGMEM static void station_list_cb(lv_obj_t * btn, lv_event_t event);
-PROGMEM static void setting_dropdown_cb(lv_obj_t * btn, lv_event_t event);
-
-// lvgl stuff
-PROGMEM static lv_obj_t *kb;
-PROGMEM static lv_obj_t * save_as_kb;
+#define BRIGHTNESS 42
+#define SETTINGS 43
 
 struct Menu;
 
 // Individual Nodes of a menu
-
-/*struct MenuNode {
-  String name;
-  bool command;
-  uint16_t color;
-  uint8_t icon;
-  TFT_eSPI_Button* button;
-  bool selected;
-  std::function<void()> callable;
-};*/
 
 struct MenuNode {
   String name;
@@ -175,29 +150,29 @@ class MenuFunctions
     Menu deviceMenu;
 
     // Device menu stuff
-    Menu whichUpdateMenu;
+    //Menu whichUpdateMenu;
     Menu failedUpdateMenu;
     Menu confirmMenu;
     Menu updateMenu;
     Menu settingsMenu;
     Menu specSettingMenu;
-    Menu languageMenu;
+    //Menu languageMenu;
     Menu sdDeleteMenu;
 
     // WiFi menu stuff
     Menu wifiSnifferMenu;
     Menu wifiScannerMenu;
     Menu wifiAttackMenu;
-    #ifdef HAS_GPS
+    /*#ifdef HAS_GPS
       Menu wardrivingMenu;
-    #endif
+    #endif*/
     Menu wifiGeneralMenu;
     Menu wifiAPMenu;
     Menu wifiIPMenu;
     Menu ssidsMenu;
-    #ifdef HAS_BT
-      Menu airtagMenu;
-    #endif
+    //#ifdef HAS_BT
+    //  Menu airtagMenu;
+    //#endif
     //#ifndef HAS_ILI9341
       Menu wifiStationMenu;
     //#endif
@@ -220,7 +195,7 @@ class MenuFunctions
 
     Menu evilPortalMenu;
 
-    static void lv_tick_handler();
+    //static void lv_tick_handler();
 
     // Menu icons
 
@@ -246,14 +221,15 @@ class MenuFunctions
     void addNodes(Menu* menu, String name, uint8_t color, Menu* child, int place, std::function<void()> callable, bool selected = false, String command = "");
     void battery(bool initial = false);
     void battery2(bool initial = false);
-    void showMenuList(Menu* menu, int layer);
     String callSetting(String key);
     void runBoolSetting(String ley);
     void displaySetting(String key, Menu* menu, int index);
     void buttonSelected(int b, int x = -1);
     void buttonNotSelected(int b, int x = -1);
     //#if (!defined(HAS_ILI9341) && defined(HAS_BUTTONS))
+    #ifdef HAS_MINI_KB
       String miniKeyboard(Menu * targetMenu, bool do_pass = false);
+    #endif
     //#endif
 
     #ifdef MARAUDER_CARDPUTER
@@ -262,8 +238,6 @@ class MenuFunctions
     #endif
 
   public:
-    MenuFunctions();
-
     Menu* current_menu;
     Menu clearSSIDsMenu;
     Menu clearAPsMenu;
@@ -285,7 +259,7 @@ class MenuFunctions
     Menu infoMenu;
     Menu apInfoMenu;
 
-    Ticker tick;
+    //Ticker tick;
 
     uint16_t x = -1, y = -1;
     boolean pressed = false;
@@ -294,19 +268,15 @@ class MenuFunctions
 
     String loaded_file = "";
 
-    void joinWiFiGFX(String essid, bool start_ap = false);
     void setGraphScale(float scale);
-    void initLVGL();
-    void deinitLVGL();
-    void selectEPHTMLGFX();
     void updateStatusBar();
-    void addSSIDGFX();
-    void addAPGFX(String type = "AP");
-    void addStationGFX();
     void buildButtons(Menu* menu, int starting_index = 0, String button_name = "");
     void changeMenu(Menu* menu, bool simple_change = false);
     void drawStatusBar();
     void displayCurrentMenu(int start_index = 0);
+    #ifndef HAS_MINI_SCREEN
+      void brightnessMode();
+    #endif
     void main(uint32_t currentTime);
     void RunSetup();
     void orientDisplay();
@@ -315,4 +285,5 @@ class MenuFunctions
 
 #endif
 #endif
+
 
